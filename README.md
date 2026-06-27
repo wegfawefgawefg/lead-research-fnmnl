@@ -70,6 +70,22 @@ The build command runs:
 
 It removes `frontend/dist/` afterward because this repo treats built frontend output as generated.
 
+## Editor Setup
+
+This repo has two Ruby bundle entry points:
+
+- `api/Gemfile` is the runtime bundle used by Docker and Railway.
+- `Gemfile` at the repo root exists for editor tooling when VS Code is opened at the repository root.
+
+For Ruby Ctrl-click / Go to Definition in VS Code, install the root bundle once:
+
+```bash
+bundle config set --local path vendor/bundle
+bundle install
+```
+
+Then run `Ruby LSP: Restart` from the VS Code command palette, or reload the window. Sorbet is not required for this demo; Ruby LSP handles normal navigation and indexing.
+
 ## Load Test
 
 Run a short smoke load test through Docker:
