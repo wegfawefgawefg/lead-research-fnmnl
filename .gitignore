@@ -43,6 +43,23 @@ build-iPhoneSimulator/
 /vendor/bundle
 /lib/bundler/man/
 
+# Frontend generated files
+frontend/dist/
+frontend/node_modules/
+node_modules/
+dist/
+
+# Local runtime and secrets
+.env
+.env.*
+!.env.example
+*.log
+
+# OS/editor noise
+.DS_Store
+.idea/
+.vscode/
+
 # for a library or gem, you might want to ignore these files since the code is
 # intended to run in multiple environments; otherwise, check them in:
 # Gemfile.lock

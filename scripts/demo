@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT_DIR"
+
+usage() {
+  cat <<'USAGE'
+Usage: scripts/demo <command>
+
+Commands:
+  up          Build and start Postgres, Sinatra API, and Vue frontend
+  down        Stop containers
+  restart     Rebuild and restart all services
+  status      Show container status
+  logs        Follow all service logs
+  smoke       Check health, readiness, catalog, and frontend HTML
+  build       Run Ruby syntax checks and Vue production build
+  load        Run a short k6 smoke load test through Docker
+  clean       Stop containers and remove local demo volumes
+
+Environment for load:
+  RPS=25 DURATION=10s scripts/demo load
+USAGE
+}
+
+case "${1:-}" in
+  up)
+    docker compose up --build
+    ;;
+  down)
+    docker compose down
+    ;;
+  restart)
+    docker compose down
+    docker compose up --build
+    ;;
+  status)
+    docker compose ps
+    ;;
+  logs)
+    docker compose logs -f
+    ;;
+  smoke)
+    curl -fsS http://localhost:4567/healthz
+    printf "\n"
+    curl -fsS http://localhost:4567/readyz
+    printf "\n"
+    curl -fsS http://localhost:4567/api/catalog | head -c 400
+    printf "\n"
+    curl -fsSI http://localhost:5174/ | sed -n '1,12p'
+    ;;
+  build)
+    docker compose exec -T api ruby -c app.rb
+    docker compose exec -T api ruby -c db.rb
+    docker compose exec -T frontend sh -lc 'npm install && npm run build && rm -rf /app/dist'
+    ;;
+  load)
+    docker run --rm --network host -v "$ROOT_DIR/loadtest:/scripts" grafana/k6 run \
+      -e BASE_URL=http://127.0.0.1:4567 \
+      -e RPS="${RPS:-25}" \
+      -e DURATION="${DURATION:-10s}" \
+      /scripts/catalog.js
+    ;;
+  clean)
+    docker compose down -v
+    ;;
+  ""|-h|--help|help)
+    usage
+    ;;
+  *)
+    usage
+    exit 1
+    ;;
+esac

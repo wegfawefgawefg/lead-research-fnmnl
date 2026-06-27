@@ -1,0 +1,10 @@
+name = "fnmnl-demo-edge"
+main = "worker.js"
+compatibility_date = "2026-06-01"
+
+[vars]
+API_ORIGIN = "https://your-railway-api.example"
+
+[[kv_namespaces]]
+binding = "RATE_LIMIT"
+id = "replace-with-cloudflare-kv-namespace-id"
