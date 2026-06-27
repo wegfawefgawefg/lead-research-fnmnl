@@ -1,0 +1,7 @@
+{
+  "sorbet.enabled": false,
+  "rubyLsp.rubyVersionManager": {
+    "identifier": "none"
+  },
+  "rubyLsp.formatter": "none"
+}
